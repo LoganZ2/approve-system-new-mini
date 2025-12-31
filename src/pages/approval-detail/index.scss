@@ -1,0 +1,47 @@
+$bg-white: #ffffff;
+$black: #111111;
+$gray: #888888;
+
+.approval-detail {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+
+  
+  /* --- HEADER --- */
+  .header {
+    flex-shrink: 0;
+    padding: 30px 40px 10px 40px; 
+    background: $bg-white;
+    position: relative;
+    z-index: 10;
+    
+    .title {
+      font-size: 42px; 
+      font-weight: 900;
+      color: $black;
+      line-height: 1.1;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: 16px;
+      color: $gray;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      display: block;
+    }
+  }
+
+  .detail-body {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 20px 40px; 
+    padding-bottom: 60px; 
+  }
+
+}

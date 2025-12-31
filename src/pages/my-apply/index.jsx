@@ -7,74 +7,31 @@ import './index.scss'
 const mockData = [
   {
     id: 1,
-    type: '年假',
-    duration: '2.5',
-    status: 'pending', 
-    startDate: '2023-10-01',
-    endDate: '2023-10-03',
-    reason: '家里有些急事需要回去处理，希望能批准，谢谢领导。',
-    rejectReason: ''
-  },
-  {
-    id: 2,
-    type: '事假',
-    duration: '1',
-    status: 'rejected', 
-    startDate: '2023-09-20',
-    endDate: '2023-09-20',
-    reason: '身体不舒服，去医院检查一下。',
-    rejectReason: '缺少医院证明，请补充后再提交。'
-  },
-  {
-    id: 3,
     type: '调休',
     duration: '0.5',
     status: 'approved',
     startDate: '2023-09-15',
     endDate: '2023-09-15',
-    reason: '上周末加班调休半天。',
-    rejectReason: ''
+    createDate: '2023-09-15',
   },
   {
-    id: 4,
-    type: '病假',
-    duration: '3',
-    status: 'approved',
-    startDate: '2023-08-10',
-    endDate: '2023-08-12',
-    reason: '重感冒发烧，无法坚持工作。',
-    rejectReason: ''
+    id: 2,
+    type: '调休',
+    duration: '0.5',
+    status: 'rejected',
+    startDate: '2023-09-15',
+    endDate: '2023-09-15',
+    createDate: '2023-09-15',
   },
   {
-    id: 5,
-    type: '年假',
-    duration: '5',
+    id: 3,
+    type: '调休',
+    duration: '0.5',
     status: 'pending',
-    startDate: '2023-11-01',
-    endDate: '2023-11-05',
-    reason: '计划带父母出去旅游一趟，很久没休息了。',
-    rejectReason: ''
+    startDate: '2023-09-15',
+    endDate: '2023-09-15',
+    createDate: '2023-09-15',
   },
-  {
-    id: 6,
-    type: '年假',
-    duration: '5',
-    status: 'pending',
-    startDate: '2023-11-01',
-    endDate: '2023-11-05',
-    reason: '计划带父母出去旅游一趟，很久没休息了。',
-    rejectReason: ''
-  },
-  {
-    id: 7,
-    type: '年假',
-    duration: '5',
-    status: 'pending',
-    startDate: '2023-11-01',
-    endDate: '2023-11-05',
-    reason: '计划带父母出去旅游一趟，很久没休息了。',
-    rejectReason: ''
-  }
 ]
 
 const tabs = [
@@ -109,7 +66,7 @@ export default function MyApply() {
 
   const getDetail = (id) => {
     Taro.navigateTo({
-      url: `/pages/apply-detail/index?id=${id}`
+      url: `/pages/approval-detail/index?id=${id}`
     })
   }
 
@@ -179,15 +136,8 @@ export default function MyApply() {
                               <Text>{item.startDate} ~ {item.endDate}</Text>
                             </View>
 
-                            {item.reason && (
-                              <Text className='reason'>{item.reason}</Text>
-                            )}
-                            
-                            {item.rejectReason && (
-                              <View className='reject-box'>
-                                <Text className='reject-label'>驳回原因：</Text>
-                                <Text className='reject-text'>{item.rejectReason}</Text>
-                              </View>
+                            {item.createDate && (
+                              <Text className='create-date'>创建时间：{item.createDate}</Text>
                             )}
                           </View>
                         </View>
