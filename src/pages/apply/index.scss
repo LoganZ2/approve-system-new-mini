@@ -1,0 +1,253 @@
+/* 颜色变量 */
+$black: #111111;
+$dark: #333333;
+$gray: #888888;
+$light-gray: #e0e0e0; 
+$bg-white: #ffffff;
+$placeholder: #cccccc;
+$bg-light: #f4f4f4;
+
+/* ... 前面的 page, header, input-box 保持不变，只要覆盖 date-row 部分 ... */
+
+page {
+  background-color: $bg-white;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, sans-serif;
+  height: 100%;
+  overflow: hidden; 
+}
+
+.apply-page {
+  height: 100vh; 
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; 
+
+  .header {
+    flex-shrink: 0;
+    padding: 30px 40px 10px 40px;
+    background-color: $bg-white;
+    z-index: 10;
+    
+    .title {
+      font-size: 42px;
+      font-weight: 900;
+      color: $black;
+      display: block;
+      margin-bottom: 6px;
+      line-height: 1.1;
+    }
+    .subtitle {
+      font-size: 16px;
+      color: $gray;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      display: block;
+    }
+  }
+
+  .form-body {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 20px 40px; 
+    padding-bottom: 60px; 
+
+    .label {
+      font-size: 20px;
+      color: $gray;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      display: block;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+    }
+
+    .input-box {
+      border-bottom: 1px solid $light-gray;
+      padding-bottom: 16px;
+      margin-bottom: 40px;
+      
+      .value-text {
+        font-size: 34px;
+        color: $black;
+        font-weight: 700;
+        line-height: 1.2;
+        &.placeholder {
+          color: $placeholder;
+          font-weight: 400;
+          font-family: 'Courier New', Courier, monospace;
+        }
+      }
+    }
+
+    .picker-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      .arrow {
+        width: 10px;
+        height: 10px;
+        border-top: 3px solid $black;
+        border-right: 3px solid $black;
+        transform: rotate(45deg);
+        margin-right: 4px;
+      }
+    }
+
+    /* --- 日期行布局 --- */
+    .date-row {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 30px; 
+
+      .date-col {
+        flex: 1; 
+        display: flex;
+        flex-direction: column;
+        
+        .date-display { 
+          margin-bottom: 15px;
+          border-bottom: 1px solid $light-gray;
+          padding-bottom: 12px;
+          
+          .value-text {
+             font-size: 34px; 
+             font-family: 'Courier New', Courier, monospace;
+             letter-spacing: -1px;
+             color: $black;
+             font-weight: 700;
+             white-space: nowrap; 
+          }
+        }
+
+        /* --- 单一 Toggle 按钮 --- */
+        .toggle-btn {
+          width: 100%;
+          padding: 12px 10px;
+          margin-top: 10px;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between; /* 文字两端分布，或者 center */
+          padding-left: 15px;
+          padding-right: 15px;
+          box-sizing: border-box;
+          border: 2px solid $light-gray;
+          transition: all 0.2s ease;
+          cursor: pointer;
+
+          .toggle-text {
+            font-size: 25px;
+            font-weight: 900;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+          }
+          .toggle-hint {
+             font-size: 20px;
+             font-weight: 600;
+          }
+
+          /* AM 状态：白底黑字 */
+          &.is-am {
+            background-color: #fff;
+            border-color: $light-gray;
+            .toggle-text { color: $black; }
+            .toggle-hint { color: $gray; }
+          }
+
+          /* PM 状态：黑底白字 */
+          &.is-pm {
+            background-color: $black;
+            border-color: $black;
+            .toggle-text { color: #fff; }
+            .toggle-hint { color: rgba(255,255,255,0.7); }
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+          }
+           
+          /* 按下效果 */
+          &:active {
+            transform: scale(0.98);
+          }
+        }
+      }
+      .date-gap { width: 30px; }
+    }
+    
+    .duration-display {
+      margin-top: 20px;
+      margin-bottom: 50px;
+      text-align: center; 
+      padding: 30px 0;
+      background: #fdfdfd; 
+      border-radius: 12px;
+      border: 1px solid #f0f0f0;
+
+      .duration-num {
+        display: block;
+        font-size: 100px;
+        font-weight: 900;
+        color: $black;
+        line-height: 0.9;
+      }
+
+      .duration-label {
+        margin-top: 10px;
+        font-size: 16px;
+        color: $gray;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 4px;
+      }
+    }
+
+    .textarea-box {
+        position: relative;
+        padding-bottom: 30px;
+        .clean-textarea {
+            width: 100%;
+            font-size: 22px;
+            color: $dark;
+            line-height: 1.5;
+            min-height: 120px;
+            padding: 0;
+            background: transparent;
+        }
+        .ph-color { color: $placeholder; }
+        .char-count {
+            position: absolute;
+            right: 0;
+            bottom: 6px;
+            font-size: 14px;
+            color: $placeholder;
+        }
+    }
+  }
+
+  .footer {
+    flex-shrink: 0;
+    padding: 10px 40px 40px 40px;
+    background-color: $bg-white;
+    border-top: 1px solid rgba(0,0,0,0.03); 
+    z-index: 10;
+
+    .submit-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: $black;
+      color: $bg-white;
+      border-radius: 12px;
+      height: 100px;
+      line-height: 64px;
+      font-size: 30px;
+      font-weight: 900;
+      border: none;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+      &:active { opacity: 0.9; transform: scale(0.98); }
+      &::after { border: none; }
+    }
+  }
+}
