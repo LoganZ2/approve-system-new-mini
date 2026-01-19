@@ -1,0 +1,57 @@
+/* src/pages/index/index.scss */
+.page-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* 撑满屏幕 */
+  width: 100%;
+  overflow: hidden;
+}
+
+.page-header {
+  flex-shrink: 0;
+  padding: 40px 30px 20px 40px;
+  background: #fff;
+  display: flex;
+  gap: 40px; /* 两个大标题的间距 */
+
+  .header-tab {
+    display: flex;
+    flex-direction: column;
+    opacity: 0.3; /* 默认灰色 */
+    transition: all 0.3s;
+    
+    &.active {
+      opacity: 1; /* 选中变黑 */
+      transform: scale(1.02);
+    }
+
+    .title {
+      font-size: 56px; /* 极简大标题粗细 */
+      font-weight: 900;
+      color: #111;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 20px;
+      color: #000;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      height: 24px; /* 占位防止跳动 */
+    }
+  }
+}
+
+.page-content {
+  flex: 1;        /* 占据剩余所有高度 */
+  min-height: 0;  /* 关键：防止Flex子元素溢出 */
+  position: relative;
+  background: #f9f9f9; /* 加一点微弱背景区分内容区 */
+  border-top-left-radius: 40px; /* 高级感圆角，如果不喜欢可以删掉 */
+  border-top-right-radius: 40px;
+  background: #fff;
+  overflow: hidden; /* 把圆角多余的切掉 */
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.02);
+}

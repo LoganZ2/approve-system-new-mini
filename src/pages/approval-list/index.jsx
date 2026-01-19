@@ -1,81 +1,44 @@
-import React, { useState } from 'react'
+/* src/views/approval-list/index.jsx */
+import React, { useEffect, useState } from 'react'
 import { View, Text, ScrollView } from '@tarojs/components'
-import { useLoad } from '@tarojs/taro'
-import Taro from '@tarojs/taro'
+import Taro, { navigateTo, useLoad } from '@tarojs/taro'
 import './index.scss'
+import { pendingApprovals } from '../../api/api'
 
 export default function ApprovalList() {
   const [approvalList, setApprovalList] = useState([])
   const [loading, setLoading] = useState(true)
 
-  useLoad(() => {
+  useEffect(() => {
     loadApprovalList()
-  })
+  }, [])
+
+  const detailPage = (id) => {
+    console.log("aowjefioawjefojwa");
+    if (id) {
+      console.log("oawiejfiowajef")
+      navigateTo({
+        url: "/pages/approval-detail/index?id=" + id
+
+      })
+    }
+  }
 
   // 模拟接口
   const loadApprovalList = () => {
     setLoading(true)
-    setTimeout(() => {
-      const mockData = [
-        {
-          id: '1',
-          applicant: '张三',
-          type: '事假',
-          startDate: '2024-01-15',
-          endDate: '2024-01-17',
-          duration: '3',
-          reason: '家里有些急事需要回去处理。',
-          applyTime: '09:30 AM'
-        },
-        {
-          id: '2',
-          applicant: '欧阳娜娜', // 带小数点的测试
-          type: '调休',
-          startDate: '2024-02-01',
-          endDate: '2024-02-01',
-          duration: '0.5', 
-          reason: '上周加班调休，身体不适需要休息一下。',
-          applyTime: '01-19'
-        },
-        {
-          id: '3',
-          applicant: '李四',
-          type: '病假',
-          startDate: '2024-01-16',
-          endDate: '2024-01-16',
-          duration: '1',
-          reason: '发烧39度，去医院挂水。',
-          applyTime: 'Yesterday'
-        },
-        {
-          id: '4',
-          applicant: '周杰伦',
-          type: '婚假',
-          startDate: '2024-05-20',
-          endDate: '2024-05-25',
-          duration: '5.0',
-          reason: '我们要结婚了，请大家吃喜糖。',
-          applyTime: '02-14'
-        },
-        {
-            id: '5',
-            applicant: '陈奕迅',
-            type: '年假',
-            startDate: '2024-07-01',
-            endDate: '2024-07-15',
-            duration: '150.5',
-            reason: '世界巡回演唱会结束后休息。',
-            applyTime: '06-20'
-        }
-      ]
-      setApprovalList(mockData)
+    const retrieval = async () => {
+      let pa = await pendingApprovals();
+      setApprovalList(pa);
       setLoading(false)
-    }, 600)
+    }
+    retrieval()
   }
 
   const handleApprove = (e, id) => {
     e.stopPropagation()
-    Taro.showToast({ title: '已通过', icon: 'success' })
+    Taro.showToast({ title: '已通过', icon: 'none' })
+    // 前端模拟删除
     setApprovalList(prev => prev.filter(item => item.id !== id))
   }
 
@@ -85,78 +48,53 @@ export default function ApprovalList() {
     setApprovalList(prev => prev.filter(item => item.id !== id))
   }
 
-  const navigateToDetail = (item) => {
-    console.log('Jump to detail', item.id)
-  }
-
   return (
-    <View className='approval-page'>
-      {/* 1. 头部固定 */}
-      <View className='header'>
-        <Text className='title'>待我审批</Text>
-        <Text className='subtitle'>
-           {loading ? 'LOADING...' : `${approvalList.length} PENDING TASKS`}
-        </Text>
+    <View className="approval-list-root"> 
+      
+      {/* 1. 因为父组件已经有 Tab 标题了，这里如果不需要额外标题可以不写。
+           如果你想要一个小的数据统计条，放在这里很合适 
+      */}
+      <View className='stats-bar'>
+        <Text className='stats-text'>WAITING FOR REVIEW</Text>
+        <Text className='stats-num'>{loading ? '-' : approvalList.length}</Text>
       </View>
 
-      {/* 2. 滚动区域：不可设置 padding */}
+      {/* 2. 核心滚动区：必须在 Flex 布局中占满 flex: 1 */}
       <ScrollView className='scroll-view-container' scrollY>
-        {/* 3. 内部容器：在这里设置 padding 左右留白 */}
         <View className='list-inner'>
           
           {loading ? (
-             <View className='status-text'><Text>Loading...</Text></View>
+             <View className='status-box'><Text>Loading List...</Text></View>
           ) : approvalList.length === 0 ? (
-             <View className='status-text'><Text>No Pending Tasks</Text></View>
+             <View className='status-box'><Text>ALL CLEAR · NO TASKS</Text></View>
           ) : (
             approvalList.map(item => (
-              <View key={item.id} className='card-item' onClick={() => navigateToDetail(item)}>
+              <View key={item.id} className='card-item' onClick={() => detailPage(item.id)}>
                 
-                {/* ------ 上半部分：左数字 + 右信息 ------ */}
+                {/* A. 信息主体区域 */}
                 <View className='card-body'>
                   
-                  {/* 左侧：定宽 120px，哪怕 0.5 也很宽裕 */}
+                  {/* 左：大数字 */}
                   <View className='left-col'>
                     <Text className='big-num'>{item.duration}</Text>
                     <Text className='unit'>DAYS</Text>
                   </View>
 
-                  {/* 右侧：信息流 */}
+                  {/* 右：详情 */}
                   <View className='right-col'>
                     <View className='user-row'>
                       <Text className='name'>{item.applicant}</Text>
                       <Text className='tag'>{item.type}</Text>
                     </View>
-                    <Text className='date'>
-                      {item.startDate} - {item.endDate}
-                    </Text>
-                    <Text className='reason'>{item.reason}</Text>
-                  </View>
-
-                </View>
-
-                {/* ------ 下半部分：按钮组 ------ */}
-                <View className='card-actions'>
-                  <View 
-                    className='btn btn-reject' 
-                    onClick={(e) => handleReject(e, item.id)}
-                  >
-                    <Text>拒绝</Text>
-                  </View>
-                  <View style={{width:'20px'}}></View> {/* 中间占位 */}
-                  <View 
-                    className='btn btn-approve' 
-                    onClick={(e) => handleApprove(e, item.id)}
-                  >
-                    <Text>通过</Text>
+                    <Text className='date'>{item.startDate} → {item.endDate}</Text>
+                    <Text className='reason' numberOfLines={2}>{item.reason}</Text>
                   </View>
                 </View>
-
               </View>
             ))
           )}
-          {/* 底部垫高 */}
-          <View style={{ height: '60px' }}></View>
+          {/* Prevent bottom cut-off */}
+          <View style={{ height: '80px' }}></View>
         </View>
       </ScrollView>
     </View>

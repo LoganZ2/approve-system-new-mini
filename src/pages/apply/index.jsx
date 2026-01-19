@@ -1,21 +1,30 @@
 import { View, Text, Textarea, Button, Picker } from '@tarojs/components'
-import { useLoad } from '@tarojs/taro'
+import { useDidShow, useLoad } from '@tarojs/taro'
 import Taro from '@tarojs/taro'
 import { useState, useEffect } from 'react'
 import './index.scss'
+import { apply } from '../../api/api'
+
+
+const leaveOptions = [
+  { value: 'personal', label: '事假' },
+  { value: 'sick', label: '病假' },
+  { value: 'annual', label: '年假' },
+  { value: 'marriage', label: '婚假' },
+  { value: 'maternity', label: '产假' },
+  { value: 'funeral', label: '丧假' }
+]
 
 export default function Apply() {
   const [formData, setFormData] = useState({
-    type: '年假',
+    type: 'annual',
     startDate: '', 
-    startPart: 'AM', 
+    startHalf: 'AM', 
     endDate: '',
-    endPart: 'PM',   
+    endHalf: 'PM',   
     reason: '',
     duration: '0' 
   })
-
-  const leaveTypes = ['事假', '病假', '年假', '调休', '婚假', '产假', '丧假']
 
   useLoad(() => { console.log('Apply page loaded.') })
 
@@ -28,8 +37,8 @@ export default function Apply() {
       const diffTime = end - start
       const diffDays = diffTime / (1000 * 60 * 60 * 24)
 
-      const startWeight = formData.startPart === 'AM' ? 0 : 0.5
-      const endWeight = formData.endPart === 'AM' ? 0.5 : 1.0
+      const startWeight = formData.startHalf === 'AM' ? 0 : 0.5
+      const endWeight = formData.endHalf === 'AM' ? 0.5 : 1.0
 
       let total = diffDays - startWeight + endWeight
 
@@ -41,7 +50,7 @@ export default function Apply() {
       }))
 
     }
-  }, [formData.startDate, formData.endDate, formData.startPart, formData.endPart])
+  }, [formData.startDate, formData.endDate, formData.startHalf, formData.endHalf])
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -54,12 +63,16 @@ export default function Apply() {
     setFormData(prev => ({ ...prev, [field]: next }))
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if(!formData.startDate || !formData.endDate) {
       Taro.showToast({ title: '请选择时间', icon: 'none' })
       return
     }
-    console.log('Final Data:', formData) 
+    let finalData = { ...formData }
+    delete finalData.duration;
+    finalData.startHalf = finalData.startHalf.toLowerCase();
+    finalData.endHalf = finalData.endHalf.toLowerCase();
+    await apply(finalData)
     Taro.showToast({ title: '提交成功', icon: 'success', duration: 2000 })
     setTimeout(() => Taro.navigateBack(), 1500)
   }
@@ -78,15 +91,21 @@ export default function Apply() {
            <View style={{flex: 1}}>
              <Text className='label'>类型 / TYPE</Text>
              <Picker 
-              mode='selector' 
-              range={leaveTypes}
-              value={leaveTypes.indexOf(formData.type)}
-              onChange={(e) => handleInputChange('type', leaveTypes[e.detail.value])}
+                mode='selector' 
+                range={leaveOptions} // 传入对象数组
+                rangeKey='label'     // 指定显示对象中的 'label' 字段 (即中文)
+                // 根据当前的 formData.type (英文) 找到它在数组中的下标
+                value={leaveOptions.findIndex(opt => opt.value === formData.type)} 
+                // 选中时，根据下标拿到对应的 value (英文) 并更新
+                onChange={(e) => handleInputChange('type', leaveOptions[e.detail.value].value)}
             >
-              <View style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                 <Text className='value-text'>{formData.type}</Text>
-                 <View className='arrow'></View>
-              </View>
+                <View style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                    {/* 显示时，在数组里找到当前英文对应的中文 label */}
+                    <Text className='value-text'>
+                    {leaveOptions.find(opt => opt.value === formData.type)?.label || '请选择'}
+                    </Text>
+                    <View className='arrow'></View>
+                </View>
             </Picker>
            </View>
         </View>
@@ -112,12 +131,12 @@ export default function Apply() {
             
             {/* 这里的按钮：根据状态变颜色/文字 */}
             <View 
-              className={`toggle-btn ${formData.startPart === 'PM' ? 'is-pm' : 'is-am'}`}
-              onClick={() => togglePart('startPart')}
+              className={`toggle-btn ${formData.startHalf === 'PM' ? 'is-pm' : 'is-am'}`}
+              onClick={() => togglePart('startHalf')}
             >
               {/* 这里显示 AM 或 PM，点击就变 */}
-              <Text className='toggle-text'>{formData.startPart}</Text>
-              <Text className='toggle-hint'>{formData.startPart === 'AM' ? '上午' : '下午'}</Text>
+              <Text className='toggle-text'>{formData.startHalf}</Text>
+              <Text className='toggle-hint'>{formData.startHalf === 'AM' ? '上午' : '下午'}</Text>
             </View>
           </View>
 
@@ -140,11 +159,11 @@ export default function Apply() {
             </Picker>
 
             <View 
-              className={`toggle-btn ${formData.endPart === 'PM' ? 'is-pm' : 'is-am'}`}
-              onClick={() => togglePart('endPart')}
+              className={`toggle-btn ${formData.endHalf === 'PM' ? 'is-pm' : 'is-am'}`}
+              onClick={() => togglePart('endHalf')}
             >
-               <Text className='toggle-text'>{formData.endPart}</Text>
-               <Text className='toggle-hint'>{formData.endPart === 'AM' ? '上午' : '下午'}</Text>
+               <Text className='toggle-text'>{formData.endHalf}</Text>
+               <Text className='toggle-hint'>{formData.endHalf === 'AM' ? '上午' : '下午'}</Text>
             </View>
           </View>
         </View>
@@ -172,10 +191,8 @@ export default function Apply() {
 
       </View>
 
-      <View className='footer'>
-        <Button className='submit-btn' onClick={handleSubmit}>
-          提交申请
-        </Button>
+      <View className='submit-btn' onClick={handleSubmit}>
+      <Text className='submit'>▲</Text>
       </View>
     </View>
   )

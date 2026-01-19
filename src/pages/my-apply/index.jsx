@@ -1,156 +1,105 @@
-import React, { useState } from 'react'
-import Taro from '@tarojs/taro'; 
+import React, { useEffect, useState } from 'react'
 import { View, Text, ScrollView, Swiper, SwiperItem } from '@tarojs/components'
 import './index.scss'
+import { navigateTo, useDidShow, useLoad } from '@tarojs/taro';
+import { getLeaveList } from '../../api/api';
 
-// Mock Data
-const mockData = [
-  {
-    id: 1,
-    type: '调休',
-    duration: '0.5',
-    status: 'approved',
-    startDate: '2023-09-15',
-    endDate: '2023-09-15',
-    createDate: '2023-09-15',
-  },
-  {
-    id: 2,
-    type: '调休',
-    duration: '0.5',
-    status: 'rejected',
-    startDate: '2023-09-15',
-    endDate: '2023-09-15',
-    createDate: '2023-09-15',
-  },
-  {
-    id: 3,
-    type: '调休',
-    duration: '0.5',
-    status: 'pending',
-    startDate: '2023-09-15',
-    endDate: '2023-09-15',
-    createDate: '2023-09-15',
-  },
-]
-
-const tabs = [
-  { key: 'all', text: '全部' },
-  { key: 'pending', text: '审批中' },
-  { key: 'approved', text: '已通过' },
-  { key: 'rejected', text: '被驳回' }
-]
+const typeMap = {
+  personal: "事假",
+  annual: "年假",
+  sick: "病假",
+  marriage: "婚假",
+  maternity: "产假",
+  funeral: "丧假"
+}
 
 export default function MyApply() {
-  const [activeTab, setActiveTab] = useState('all')
-  const currentSwiperIndex = tabs.findIndex(t => t.key === activeTab)
 
-  const handleSwiperChange = (e) => {
-    const index = e.detail.current
-    setActiveTab(tabs[index].key)
+  const tabs = [
+    { key: 'all', text: '全部' },
+    { key: 'pending', text: '审批中' },
+    { key: 'approved', text: '已通过' },
+    { key: 'rejected', text: '被驳回' }
+  ];
+
+  const [currentSwiperIndex, setIndex] = useState(0);
+  const [data, setData] = useState([]);
+
+  const refresh = () => {
+    // 在内部定义 async 函数并调用
+    const init = async () => {
+        const data = await getLeaveList();
+        setData(data);
+    };
+    init();
   }
 
-  const getListByKey = (key) => {
-    if (key === 'all') return mockData
-    return mockData.filter(item => item.status === key)
-  }
-
-  const getStatusInfo = (status) => {
-    switch (status) {
-      case 'approved': return { text: '已通过', colorClass: 'status-approved' }
-      case 'pending': return { text: '审批中', colorClass: 'status-pending' }
-      case 'rejected': return { text: '已驳回', colorClass: 'status-rejected' }
-      default: return { text: '', colorClass: '' }
-    }
-  }
-
-  const getDetail = (id) => {
-    Taro.navigateTo({
-      url: `/pages/approval-detail/index?id=${id}`
-    })
-  }
+  useEffect(refresh, [])
+  useDidShow(refresh);
 
   return (
-    <View className='my-apply'>
-      {/* HEADER: 增加英语小字 */ }
-      <View className='header'>
-        <Text className='title'>我的申请</Text>
-        {/* 这里！和审批页保持一致的风格 */}
-        <Text className='subtitle'>
-          {mockData.length} HISTORY RECORDS
-        </Text>
-      </View>
-
-      {/* TABS */}
-      <View className='tabs'>
-        {tabs.map(tab => (
+    <View className="my-apply-root">
+      {/* 内部 Tab 栏 */}
+      <View className="inner-tabs">
+        {tabs.map((t, idx) => (
           <View 
-            key={tab.key}
-            className={`tab ${activeTab === tab.key ? 'active' : ''}`}
-            onClick={() => setActiveTab(tab.key)}
+            key={t.key} 
+            className={`tab-item ${currentSwiperIndex === idx ? 'active' : ''}`}
+            onClick={() => setIndex(idx)}
           >
-            <Text>{tab.text}</Text>
+            {t.text}
+            {currentSwiperIndex === idx && <View className="check-dot" />}
           </View>
         ))}
       </View>
 
-      {/* SWIPER LIST */}
+      {/* 核心轮播列表区域 */}
       <Swiper 
-        className='swiper-box'
+        className='content-swiper'
         current={currentSwiperIndex}
-        onChange={handleSwiperChange}
+        onChange={(e) => setIndex(e.detail.current)}
         duration={300}
-        indicatorDots={false}
       >
-        {tabs.map(tab => {
-          const listData = getListByKey(tab.key)
-          return (
-            <SwiperItem key={tab.key} className='swiper-item-wrap'>
-              <ScrollView className='list-scroll' scrollY>
-                <View className='list-inner'>
-                  {listData.length === 0 ? (
-                    <View className='empty'>
-                      <Text>暂无{tab.text}记录</Text>
-                    </View>
-                  ) : (
-                    listData.map(item => {
-                      const statusInfo = getStatusInfo(item.status)
-                      return (
-                        <View key={item.id} className='apply-item' onClick={() => getDetail(item.id)}>
-                          {/* 左侧：左对齐大数字 */}
-                          <View className='left-col'>
-                            <Text className='big-num'>{item.duration}</Text>
-                            <Text className='unit'>DAYS</Text>
-                          </View>
+        {tabs.map(tab => (
+          <SwiperItem key={tab.key} className='swiper-item-box'>
+            <ScrollView className='scroll-v' scrollY>
+              <View className='list-padder'>
+                {data.filter(item => item.status === tab.key || tab.key === "all").map(item => (
+                   <View key={item.id} className='card-item' onClick={() => {}}>
+                      {/* 左侧大数字 */}
+                      <View className='left-part'>
+                        <Text className='big-stat'>{item.duration}</Text>
+                        <Text className='small-label'>DAYS</Text>
+                      </View>
 
-                          {/* 右侧：内容 */}
-                          <View className='right-content'>
-                            <View className='top-row'>
-                              <Text className='type'>{item.type}</Text>
-                              <View className={`status-badge ${statusInfo.colorClass}`}>
-                                <Text>{statusInfo.text}</Text>
-                              </View>
-                            </View>
-
-                            <View className='date-range'>
-                              <Text>{item.startDate} ~ {item.endDate}</Text>
-                            </View>
-
-                            {item.createDate && (
-                              <Text className='create-date'>创建时间：{item.createDate}</Text>
-                            )}
-                          </View>
+                      {/* 中间信息 */}
+                      <View className='mid-part'>
+                        <Text className='type-title' numberOfLines={1}>{typeMap[item.type]}</Text>
+                        <View className="time-row">
+                             <Text className='date-val'>{item.startDate} → {item.endDate}</Text>
                         </View>
-                      )
-                    })
-                  )}
-                  <View style={{ height: '50px' }}></View>
-                </View>
-              </ScrollView>
-            </SwiperItem>
-          )
-        })}
+                      </View>
+                      
+                      {/* 右侧状态标签 */}
+                      <View className={`right-tag tag-${item.status}`}>
+                        <Text>{tabs.find(i => i.key === item.status).text}</Text>
+                      </View>
+                   </View>
+                ))}
+                {/* 底部垫高，防止 Button 遮挡 */}
+                <View style={{height: '100px'}}></View>
+              </View>
+            </ScrollView>
+          </SwiperItem>
+        ))}
       </Swiper>
+      
+      {/* 悬浮按钮 */}
+      <View className="float-btn" onClick={() => navigateTo({
+        url: '/pages/apply/index'
+      })}> 
+        <Text className='plus'>+</Text>
+      </View>
     </View>
   )
 }

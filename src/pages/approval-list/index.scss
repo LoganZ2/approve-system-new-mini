@@ -1,212 +1,213 @@
 /* 颜色变量 */
-$black: #111111;
-$dark: #333333;
-$gray: #888888;
-$dark-gray: #333333;
-$med-gray: #888888;
-$light-gray: #eeeeee;
-$red: #ff3d00;
-$green: #00c853; /* 补充绿色变量，如果之后用到通过 */
-$bg-white: #ffffff;
+$black: #111;
+$dark: #333;
+$med-gray: #888;
+$light-gray: #eee;
+$bg-color: #ffffff; /* 确保背景纯白 */
+$c-black: #1a1a1a;
 
-page {
-  height: 100%;
-  overflow: hidden; 
-  background-color: $bg-white;
-  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, sans-serif;
-  box-sizing: border-box; /* 全局盒模型防炸 */
-}
-
-.approval-page {
-  height: 100vh;
-  width: 100%;
+.approval-list-root {
   display: flex;
   flex-direction: column;
+  height: 100%;
+  position: relative;
+  /* 确保根容器也是撑满的 */
+  width: 100%; 
+  background: $bg-color;
+}
 
-  /* --- HEADER --- */
-  .header {
-    flex-shrink: 0;
-    padding: 30px 40px 10px 40px; 
-    background: $bg-white;
-    position: relative;
-    z-index: 10;
-    
-    .title {
-      font-size: 42px; 
-      font-weight: 900;
-      color: $black;
-      line-height: 1.1;
-      display: block;
-      margin-bottom: 6px;
-    }
-
-    .subtitle {
-      font-size: 16px;
-      color: $gray;
-      font-weight: 600;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      display: block;
-    }
+/* 顶部统计条 layout */
+.stats-bar {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 40px; 
+  /* 增加一点距离头部大标题的间距，防止太挤 */
+  margin-top: 10px; 
+  border-bottom: 1px solid #f5f5f5; 
+  
+  .stats-text { 
+    font-size: 20px; 
+    font-weight: 700; 
+    color: #ccc; 
+    letter-spacing: 1px; 
   }
+  .stats-num { 
+    font-size: 24px; 
+    font-weight: 900; 
+    color: $black; 
+  }
+}
 
-  /* --- SCROLL VIEW --- */
-  .scroll-view-container {
-    flex: 1;
-    min-height: 0px;
-    width: 100%;
-    background: $bg-white;
-    
-    .list-inner {
-      padding: 0 40px; 
-      padding-bottom: 40px; /* 底部多留点白 */
-      width: 100%;
-      box-sizing: border-box; 
+.scroll-view-container {
+  flex: 1; 
+  min-height: 0;
+  width: 100%;
+}
 
-      .status-text {
-        text-align: center;
-        padding-top: 100px;
-        color: #ccc;
-        font-size: 24px; /* 空状态文字也加大 */
-        font-weight: 600;
+/* 缺省页样式 - 做得好看一点 */
+.status-box {
+  text-align: center;
+  padding-top: 150px;
+  font-size: 28px;
+  color: #ddd;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  // 给它旋转一点点，显得有点设计感
+  transform: rotate(-2deg); 
+  opacity: 0.5;
+}
+
+.list-inner {
+  // 设置内边距，确保内容不贴边
+  padding: 0 40px; 
+  box-sizing: border-box;
+  width: 100%;
+
+  .card-item {
+    display: flex;
+    flex-direction: column;
+    padding: 40px 0;
+    /* 使用虚线更有票据感，同时颜色淡一点 */
+    border-bottom: 2px dashed #f0f0f0; 
+    width: 100%; /* 强制占满宽度 */
+
+    /* ====== 上半部分：左右布局 ====== */
+    .card-body {
+      display: flex;
+      flex-direction: row;
+      /* 只要上面内容还没撑满，保证它占满 */
+      width: 100%; 
+      margin-bottom: 30px; /* 让信息和按钮拉开距离 */
+      
+      /* 左侧：天数大字 */
+      .left-col {
+        width: 110px; /* 稍微给宽一点点 */
+        flex-shrink: 0;
+        padding-top: 5px;
+        text-align: left;
+        
+        .big-num {
+          display: block;
+          font-size: 50px;
+          font-weight: 800;
+          line-height: 0.9;
+          color: $c-black;
+          font-family: 'DIN Alternate', fantasy, sans-serif;
+        }
+        .unit {
+          font-size: 18px;
+          color: #bbb;
+          font-weight: 700;
+          margin-top: 6px;
+          display: block;
+          letter-spacing: 1px;
+        }
       }
 
-      /* 单个卡片 */
-      .card-item {
+      /* 右侧：详细信息 */
+      .right-col {
+        flex: 1; 
+        min-width: 0; /* 必须写，防止Flex溢出 */
+        padding-left: 20px;
         display: flex;
         flex-direction: column;
-        padding: 30px 0;
-        border-bottom: 1px solid $light-gray;
 
-        /* 上半部分：左右布局 */
-        .card-body {
+        .user-row {
           display: flex;
-          flex-direction: row;
-          margin-bottom: 30px; /* 增加与按钮的间距 */
-          
-          /* 左侧数字区 */
-          .left-col {
-            width: 120px;
-            flex-shrink: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start; 
-            padding-top: 4px;
-
-            .big-num {
-              font-size: 46px;
-              font-weight: 800;
-              color: $black;
-              font-family: 'DIN Alternate', sans-serif;
-              letter-spacing: -2px;
-            }
-
-            .unit {
-              font-size: 18px; /* 同步大字号 */
-              color: $gray;
-              font-weight: 800;
-              text-transform: uppercase;
-              margin-top: 6px;
-              margin-left: 2px;
-            }
-          }
-
-          /* 右侧信息 */
-          .right-col {
-            flex: 1;
-            min-width: 0; /* 防止Flex子项撑爆 */
-            display: flex;
-            flex-direction: column;
-
-            /* 姓名 + 标签行 */
-            .user-row {
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              margin-bottom: 12px;
-              
-              .name {
-                font-size: 28px;
-                font-weight: 800;
-                color: $black;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                margin-right: 10px; 
-              }
-              
-              .tag {
-                flex-shrink: 0;
-                font-size: 22px;
-                background: #f4f4f4;
-                color: $black;
-                font-weight: 700;
-                padding: 6px 14px;
-                border-radius: 6px;
-                line-height: 1;
-              }
-            }
-
-            .date {
-              font-size: 25px; /* 20 -> 22: 日期很重要，加大一点 */
-              color: $dark-gray;
-              font-weight: 600;
-              margin-bottom: 12px;
-              font-variant-numeric: tabular-nums; /* 数字等宽对齐 */
-              /* 如果你是 '2023-01-01 - 2023-01-05' 这么长，可能需要换行 */
-              word-break: break-all; 
-              line-height: 1.3;
-            }
-
-            .reason {
-              font-size: 25px;
-              color: $med-gray;
-              line-height: 1.5;
-              /* 防止长单词撑开布局 */
-              word-wrap: break-word; 
-              word-break: break-word;
-            }
-          }
-        }
-
-        /* 下半部分：按钮组 */
-        .card-actions {
-          display: flex;
-          flex-direction: row;
-          width: 100%;
           justify-content: space-between;
+          align-items: center; 
+          margin-bottom: 15px;
           
-          .btn {
-            flex: 1; 
-            height: 64px; /* 54 -> 64 更容易点击 */
-            border-radius: 12px; /* 圆角稍微大一点 */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px; /* 20 -> 24 */
+          .name {
+            font-size: 34px;
             font-weight: 800;
-            transition: all 0.1s;
+            color: $dark;
+            flex: 1; /* 让名字占据空余空间 */
+            margin-right: 15px; 
             white-space: nowrap;
-
-            &:active { 
-               opacity: 0.8;
-               transform: scale(0.98); 
-            }
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
-
-          .btn-reject {
-            background: #fff;
-            border: 3px solid #e0e0e0; /* 边框稍微加粗 */
-            color: $red;
-          }
-
-          .btn-approve {
-            background: $black;
-            border: 3px solid $black;
+          
+          /* 标签样式优化：黑底白字太重了，改成黑边框空心或者淡黑 */
+          .tag {
+            flex-shrink: 0;
+            background: $black; 
             color: #fff;
-            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+            font-size: 22px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 4px;
+             /* 如果你想让标签没那么抢眼，换成这个颜色：
+             background: #f0f0f0; color: #333; 
+             */
           }
         }
+
+        .date {
+          font-size: 24px;
+          color: $med-gray;
+          font-weight: 500;
+          margin-bottom: 10px;
+          letter-spacing: 0.5px;
+          // 使用 monospace 字体对齐数字
+          font-variant-numeric: tabular-nums; 
+        }
+
+        .reason {
+          font-size: 26px;
+          color: #666;
+          line-height: 1.4;
+          // 最多两行，多了省略
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+      }
+    }
+
+    /* ====== 重点修复：按钮组 ====== */
+    .card-actions {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%; /* 【关键】必须强制占满 100% */
+      
+      .btn {
+        flex: 1; /* 【关键】让按钮平分空间 */
+        height: 80px; /* 固定高度，确保好点 */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px; /* 方形圆角 */
+        font-size: 26px;
+        font-weight: 900;
+        letter-spacing: 1px;
+        
+        /* 简单动画 */
+        &:active { 
+          opacity: 0.8; 
+          transform: scale(0.98);
+        }
+      }
+
+      .btn-reject {
+        margin-right: 20px; /* 【关键】给右边留出空隙 */
+        background: #fff;
+        border: 2px solid $light-gray; /* 边框细一点精致 */
+        color: #bbb; /* 拒绝也是灰色，不喧宾夺主 */
+      }
+
+      .btn-approve {
+        background: $black;
+        color: #fff;
+        /* 给通过按钮加一点淡淡的阴影，显档次 */
+        box-shadow: 0 5px 15px rgba(0,0,0,0.25);
       }
     }
   }

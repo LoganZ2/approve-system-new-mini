@@ -1,10 +1,14 @@
-
 import { useLaunch } from '@tarojs/taro'
 
 import './app.scss'
 
+
+
 function App({ children }) {
-  useLaunch(() => {
+  useLaunch(async () => {
+    await wx.cloud.init({
+      env: 'prod-0gov9rdc5eed3c97'
+    })
     console.log('App launched.')
   })
 

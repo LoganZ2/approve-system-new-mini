@@ -62,7 +62,7 @@
     "@babel/preset-react": "^7.24.1",
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
-    "@tarojs/cli": "4.1.9",
+    "@tarojs/cli": "^4.1.9",
     "@tarojs/plugin-generator": "4.1.9",
     "@tarojs/vite-runner": "4.1.9",
     "@types/minimatch": "^5",

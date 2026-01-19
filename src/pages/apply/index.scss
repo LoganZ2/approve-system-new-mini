@@ -226,28 +226,33 @@ page {
     }
   }
 
-  .footer {
-    flex-shrink: 0;
-    padding: 10px 40px 40px 40px;
-    background-color: $bg-white;
-    border-top: 1px solid rgba(0,0,0,0.03); 
-    z-index: 10;
 
-    .submit-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: $black;
-      color: $bg-white;
-      border-radius: 12px;
-      height: 100px;
-      line-height: 64px;
-      font-size: 30px;
-      font-weight: 900;
-      border: none;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-      &:active { opacity: 0.9; transform: scale(0.98); }
-      &::after { border: none; }
+    /* 优雅的悬浮按钮 */
+  .submit-btn {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 110px;
+    height: 110px;
+    background: #111;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    z-index: 100;
+    
+    .submit {
+      color: #fff;
+      font-size: 40px;
+      font-weight: 800;
+      line-height: 1;
+      margin-top: -6px; /* 视觉对齐 */
+    }
+
+    &:active {
+      transform: translateX(-50%) scale(0.95);
     }
   }
 }

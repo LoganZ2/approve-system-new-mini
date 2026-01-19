@@ -1,239 +1,177 @@
-/* 颜色变量 */
-$black: #111111;
-$dark-gray: #333333;
-$med-gray: #888888;
-$light-gray: #eeeeee;
-$green: #00c853; 
-$orange: #ffab00;
-$red: #ff3d00;
-$bg-white: #ffffff;
+/* src/components/my-apply/my-apply.scss */
 
-page {
-  height: 100%;
-  overflow: hidden;
-  background-color: $bg-white;
-  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, sans-serif;
-  /* 全局防止 padding 撑爆宽度 */
-  box-sizing: border-box; 
-}
+/* ===== SCSS 配置 ===== */
+$c-black: #1a1a1a;
+$c-gray: #888;
+$c-border: #f0f0f0;
 
-.my-apply {
-  height: 100vh;
-  width: 100%;
+.my-apply-root {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  height: 100%; /* 全高，因为 index.scss 里的 page-content 给了 flex:1 */
+  position: relative;
+}
 
-  /* --- HEADER --- */
-  .header {
-    flex-shrink: 0;
-    padding: 30px 40px 10px 40px;
-    background: $bg-white;
-    z-index: 10;
+/* 内部 Tab 像 Chips 一样排列 */
+.inner-tabs {
+  padding: 10px 40px;
+  display: flex;
+  gap: 30px;
+  border-bottom: 2px solid #fafafa;
+  
+  .tab-item {
+    font-size: 26px;
+    color: #999;
+    font-weight: 600;
+    padding: 10px 0;
+    position: relative;
+    transition: color 0.2s;
     
-    .title {
-      display: block;
-      font-size: 42px;
+    &.active {
+      color: #000;
       font-weight: 900;
-      color: $black;
-      line-height: 1.1;
-      margin-bottom: 6px; 
+      font-size: 28px;
     }
 
-    .subtitle {
-      font-size: 16px;
-      color: $med-gray;
-      font-weight: 600;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      display: block;
-    }
-  }
-
-  /* --- TABS --- */
-  .tabs {
-    flex-shrink: 0;
-    display: flex;
-    padding: 0 40px;
-    margin-bottom: 10px;
-    background: $bg-white;
-    z-index: 10;
-    // border-bottom: 1px solid rgba(0,0,0,0.03); 既然要做大字体，线条可以稍微淡一点或者去掉
-
-    .tab {
-      margin-right: 35px; /* 稍微拉大间距，防止大字体下太拥挤 */
-      padding: 12px 0;
-      color: $med-gray;
-      font-size: 25px;
-      font-weight: 600;
-      position: relative;
-      transition: all 0.2s;
-      white-space: nowrap; /* 防止tab换行 */
-
-      &.active {
-        color: $black;
-        font-weight: 900;
-        
-        &::after {
-          content: '';
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          width: 100%; /* 这里建议改成 40%-50% 并居中，会更精致，全宽也可以 */
-          left: 50%; transform: translateX(-50%); width: 20px; /* 改成小短横线更高级 */
-          height: 4px; /* 加粗 */
-          background: $black;
-          border-radius: 2px;
-        }
-      }
+    .check-dot {
+      position: absolute;
+      bottom: 2px;
+      left: 50%;
+      width: 6px;
+      height: 6px;
+      background: #000;
+      border-radius: 50%;
+      transform: translateX(-50%);
     }
   }
+}
 
-  /* --- SWIPER --- */
-  .swiper-box {
-    flex: 1; 
+/* Swiper 高度修复的核心 */
+.content-swiper {
+  flex: 1;       /* 占满剩余所有高度 */
+  min-height: 0; /* WebKit Flexbox fix */
+  
+  .swiper-item-box {
     height: 100%;
     
-    .swiper-item-wrap {
+    .scroll-v {
       height: 100%;
-      display: flex;
-      flex-direction: column;
-    }
-    
-    .list-scroll {
-      flex: 1;
-      min-height: 0px;
       width: 100%;
-      background: $bg-white;
-
-      .list-inner {
-        padding: 0 40px; 
-        padding-bottom: 40px; /* 底部留白，防止最后一个被遮挡 */
-        box-sizing: border-box;
-
-        .empty {
-          padding-top: 100px;
-          text-align: center;
-          color: #ccc;
-          font-size: 30px;
-          font-style: italic;
-        }
-
-        .apply-item {
-          display: flex;
-          padding: 30px 0;
-          border-bottom: 1px solid $light-gray;
-          align-items: stretch; /* 改为 stretch 让左右等高，便于布局 */
-
-          /* 左侧列：天数 */
-          .left-col {
-            width: 120px;
-            flex-shrink: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start; 
-            padding-top: 4px;
-             
-            .big-num {
-              font-size: 46px;
-              font-weight: 800;
-              color: $black;
-              font-family: 'DIN Alternate', sans-serif;
-              letter-spacing: -2px;
-            }
-
-            .unit {
-              font-size: 18px; /* 稍微缩小一点，形成对比 */
-              color: $med-gray;
-              font-weight: 700;
-              text-transform: uppercase;
-              margin-top: 6px;
-              margin-left: 2px; 
-            }
-          }
-    
-          /* 右侧内容 */
-          .right-content {
-            flex: 1;
-            min-width: 0; /* 【关键】防止 Flex 子元素内容溢出失效 */
-            display: flex;
-            flex-direction: column;
-    
-            .top-row {
-              display: flex;
-              justify-content: space-between;
-              align-items: center; /* 垂直居中对齐 */
-              margin-bottom: 12px;
-    
-              .type {
-                font-size: 28px;
-                font-weight: 800;
-                color: $black;
-                /* 【关键】防止类型文字太长把右边标签挤出屏幕 */
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                margin-right: 10px; 
-              }
-    
-              .status-badge {
-                flex-shrink: 0; /* 【关键】禁止标签被压缩 */
-                font-size: 22px; /* 稍微缩小以适应布局，或者保持25看具体效果 */
-                font-weight: 700;
-                border-radius: 6px;
-                padding: 6px 14px; /* 稍微调整 padding 让视觉更平衡 */
-                line-height: 1; /* 防止 padding 导致的垂直偏移 */
-
-                /* 增加一点背景透明度，看起来更清透 */
-                &.status-approved { color: $green; background: rgba($green, 0.12); }
-                &.status-pending { color: $orange; background: rgba($orange, 0.12); }
-                &.status-rejected { color: $red; background: rgba($red, 0.12); }
-              }
-            }
-    
-            .date-range {
-              font-size: 25px; /* 20 -> 22: 日期很重要，加大一点 */
-              color: $dark-gray;
-              font-weight: 600;
-              margin-bottom: 12px;
-              font-variant-numeric: tabular-nums; /* 数字等宽对齐 */
-              /* 如果你是 '2023-01-01 - 2023-01-05' 这么长，可能需要换行 */
-              word-break: break-all; 
-              line-height: 1.3;
-            }
-    
-            .create-date {
-              font-size: 25px;
-              color: $med-gray;
-              line-height: 1.5;
-              /* 防止长单词撑开布局 */
-              word-wrap: break-word; 
-              word-break: break-word;
-            }
-
-            .reject-box {
-              margin-top: 14px;
-              padding: 12px;
-              background: #fff5f5; 
-              border-radius: 8px;
-              display: flex; /* 让 label 和 text 更好对齐 */
-              
-              .reject-label {
-                flex-shrink: 0;
-                font-size: 20px;
-                color: $red;
-                font-weight: 700;
-                margin-right: 6px;
-              }
-              .reject-text {
-                font-size: 20px;
-                color: $red;
-                line-height: 1.4;
-              }
-            }
-          }
-        }
+      
+      .list-padder {
+        padding: 20px 40px;
       }
     }
+  }
+}
+
+/* 卡片样式 */
+.card-item {
+  display: flex;
+  align-items: center; /* 垂直居中 */
+  padding: 30px 0;
+  border-bottom: 1px dashed $c-border;
+  
+  /* 左侧 */
+  .left-part {
+    width: 110px;
+    flex-shrink: 0;
+    text-align: left;
+    
+    .big-stat {
+      display: block;
+      font-size: 50px;
+      font-weight: 800;
+      line-height: 0.9;
+      color: $c-black;
+      font-family: 'DIN Alternate', fantasy, sans-serif;
+    }
+    
+    .small-label {
+      font-size: 18px;
+      color: #bbb;
+      font-weight: 700;
+      margin-top: 6px;
+      display: block;
+      letter-spacing: 1px;
+    }
+  }
+
+  /* 中间内容，自适应宽度 */
+  .mid-part {
+    flex: 1;
+    min-width: 0; /* 防止Flex被文字撑爆，必须加 */
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .type-title {
+      font-size: 32px;
+      color: #333;
+      font-weight: bold;
+      margin-bottom: 8px;
+      /* 单行截断 */
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      display: block;
+    }
+
+    .time-row {
+      display: flex;
+      align-items: center;
+      .date-val {
+        font-size: 24px;
+        color: #777;
+        font-family: monospace; /* 稍微等宽一点 */
+        background: #f4f4f4;
+        padding: 4px 10px;
+        border-radius: 4px;
+      }
+    }
+  }
+
+  /* 右侧标签 */
+  .right-tag {
+    flex-shrink: 0;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 20px;
+    font-weight: 900;
+     
+    // 状态配色
+    &.tag-approved { background: #e0f8e9; color: #00a854; }
+    &.tag-rejected { background: #ffefef; color: #ff4d4f; }
+    &.tag-pending  { background: #fff7e6; color: #fa8c16; }
+  }
+}
+
+/* 优雅的悬浮按钮 */
+.float-btn {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 110px;
+  height: 110px;
+  background: #111;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  z-index: 100;
+  
+  .plus {
+    color: #fff;
+    font-size: 60px;
+    font-weight: 800;
+    line-height: 1;
+    margin-top: -6px; /* 视觉对齐 */
+  }
+
+  &:active {
+    transform: translateX(-50%) scale(0.95);
   }
 }
