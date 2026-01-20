@@ -30,10 +30,21 @@ export const getDepartmentList = async () => {
   return await http.get('/user/department-list')
 }
 
+export const applicationDetails = async (id) => {
+  let res = await http.get(`/leave/application-details/${id}`)
+  res.startDate = res.startDate.split('T')[0];
+  res.endDate = res.endDate.split('T')[0];
+  return res;
+}
+
 export const register = async (params) => {
   return await http.post('/user/register', params)
 }
 
 export const apply = async (params) => {
   return await http.post('/leave/apply', params)
+}
+
+export const approve = async (params) => {
+  return await http.post('/leave/approve', params)
 }

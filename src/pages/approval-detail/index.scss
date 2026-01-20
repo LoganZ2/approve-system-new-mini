@@ -3,27 +3,45 @@ $c-card: #ffffff;
 $c-black: #1a1a1a;
 $font-din: 'DIN Alternate', sans-serif;
 
-page { background-color: $c-bg; }
+page { 
+  background-color: $c-bg; 
+  height: auto !important;     // 严禁写 100% 或 100vh，否则内容将被截断
+  min-height: 100%;            // 保证背景色铺满
+  overflow-y: auto !important; // 强制开启 Y 轴滚动
+  overflow-x: hidden;
+}
 
+// 主容器
 .approval-detail {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.detail-scroll {
-  height: 100%;
+  width: 100%;
+  // height 必须是 auto，靠内容撑开
+  height: auto;
+  min-height: 100vh; 
+  position: relative;
+  // 改回 block 布局最稳妥，避免 Flex 设置高度问题
+  display: block; 
   box-sizing: border-box;
-  padding: 0 32px; // 核心修正：两侧留白
+  
+  // 底部安全区兼容
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* 顶部与状态 */
+// 内容区域的左右留白
+.content-section {
+  padding: 0 32px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 顶部 Header */
 .header {
   padding: 30px 10px 20px 10px;
   .title { font-size: 48px; font-weight: 800; color: $c-black;}
   .subtitle { font-size: 20px; color: #bbb; letter-spacing: 2px; font-weight: 700; margin-top: 6px; display: block;}
 }
 
+/* 状态 Banner */
 .status-banner {
   border-radius: 24px; padding: 40px; margin-top: 10px; position: relative; overflow: hidden;
   .status-en { font-size: 60px; font-family: $font-din; font-weight: 900;}
@@ -34,9 +52,10 @@ page { background-color: $c-bg; }
   &.status-reject  { background: #fff0f0; color: #ff5252; }
 }
 
-/* 详情卡片 */
+/* 信息卡片 */
 .info-card {
-  background: $c-card; border-radius: 20px; padding: 40px 30px; margin-top: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+  background: $c-card; border-radius: 20px; padding: 40px 30px; margin-top: 30px; 
+  box-shadow: 0 5px 20px rgba(0,0,0,0.03);
   
   .card-top { display: flex; justify-content: space-between; margin-bottom: 20px; color: #999; font-size: 26px; }
   
@@ -69,7 +88,7 @@ page { background-color: $c-bg; }
   }
 }
 
-/* 新版 Timeline */
+/* 流程区域 (Timeline) */
 .process-area {
   margin-top: 40px;
   .section-header { font-size: 24px; color: #bbb; font-weight: 800; margin-left: 10px; margin-bottom: 25px; display:block; letter-spacing: 1px;}
@@ -93,10 +112,14 @@ page { background-color: $c-bg; }
       .right-info {
            margin-bottom: 30px; flex:1;
            .step-tag { font-size: 18px; color: #ccc; font-weight: 700; font-family: $font-din; display:block;}
-           .step-title { 
-               font-size: 28px; color: #999; font-weight: 700; display:block; margin: 4px 0 10px 0;
-               .badg { font-size: 16px; background:#eee; color:#666; padding: 2px 6px; border-radius: 4px; border:1px solid #ddd; margin-left: 8px; vertical-align: middle; }
+           .title-row { // Fix alignment
+                display: flex; align-items: center; margin: 4px 0 10px 0;
+                .step-title { 
+                    font-size: 28px; color: #999; font-weight: 700; 
+                }
+                .badg { font-size: 18px; background:#f0f0f0; color:#666; padding: 2px 6px; border-radius: 4px; margin-left: 10px;}
            }
+           
            .step-meta { font-size: 24px; color: #999; .auth { color: #333; font-weight: 700;} }
            
            .peer-list {
@@ -104,7 +127,8 @@ page { background-color: $c-bg; }
                .peer-item {
                    background: #fff; border: 1px solid #eee; padding: 15px; border-radius: 8px; margin-bottom: 10px;
                    .p-name { font-size: 24px; font-weight: 700; color: #555;}
-                   .p-comt { font-size: 24px; color: #888; margin-top: 6px;}
+                   .p-comt { font-size: 24px; color: #888; margin-top: 6px; border-top: 1px solid #f9f9f9; padding-top: 6px;}
+                   .waiting-tag { color: #aaa; margin-left: 10px; font-weight: 400; font-size: 22px;}
                }
            }
       }
@@ -119,24 +143,35 @@ page { background-color: $c-bg; }
       &.is-reject {
            .left-track .dot { background: #ff4d4f; border-color: #ff4d4f;}
            .right-info .step-title { color: #ff4d4f; }
-           .right-info .peer-list .peer-item { border-left: 3px solid #ff4d4f; } // 给卡片加个红边条
+           .right-info .peer-list .peer-item { border-left: 3px solid #ff4d4f; } 
       }
   }
 }
 
-/* 底部操作区 (当需要本人审批时) */
+/* 底部浮动操作栏 - 固定定位 */
 .action-bar-float {
-    position: fixed; bottom: 0; left: 0; right: 0;
+    position: fixed; 
+    bottom: 0; 
+    left: 0; 
+    right: 0;
+    // z-index 设高，保证在内容之上
+    z-index: 999;
+    
     background: #fff;
     border-top-left-radius: 30px; border-top-right-radius: 30px;
     box-shadow: 0 -5px 30px rgba(0,0,0,0.1);
-    padding: 30px 40px 60px 40px; // bottom留出HomeBar
-    z-index: 100;
+    
+    padding: 30px 40px; // 基础 Padding
+    padding-bottom: calc(30px + constant(safe-area-inset-bottom));
+    padding-bottom: calc(30px + env(safe-area-inset-bottom));
+    
     animation: slideUp 0.3s ease-out;
 
     .input-wrap {
-        background: #f5f5f5; border-radius: 16px; padding: 20px;
-        .audit-txt { width: 100%; min-height: 80px; font-size: 28px; line-height: 1.4; color: #333;}
+        background: #f7f8fa; border-radius: 16px; padding: 20px;
+        .audit-txt { 
+            width: 100%; min-height: 80px; font-size: 28px; line-height: 1.4; color: #333;
+        }
     }
 
     .btn-row {
@@ -144,7 +179,7 @@ page { background-color: $c-bg; }
         display: flex; justify-content: flex-end; margin-top: 20px; gap: 20px;
         .btn-opt {
             margin: 0; // reset
-            font-size: 28px; font-weight: 700; padding: 0 40px; line-height: 2.8; border-radius: 50px;
+            font-size: 28px; font-weight: 700; padding: 0 40px; height: 80px; line-height: 80px; border-radius: 50px;
             border: none;
             &:after { border: none;}
         }

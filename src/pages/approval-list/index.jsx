@@ -1,7 +1,7 @@
 /* src/views/approval-list/index.jsx */
 import React, { useEffect, useState } from 'react'
 import { View, Text, ScrollView } from '@tarojs/components'
-import Taro, { navigateTo, useLoad } from '@tarojs/taro'
+import Taro, { navigateTo, useLoad, usePullDownRefresh } from '@tarojs/taro'
 import './index.scss'
 import { pendingApprovals } from '../../api/api'
 
@@ -13,13 +13,14 @@ export default function ApprovalList() {
     loadApprovalList()
   }, [])
 
+  usePullDownRefresh(() => {
+    loadApprovalList()
+  })
+
   const detailPage = (id) => {
-    console.log("aowjefioawjefojwa");
     if (id) {
-      console.log("oawiejfiowajef")
       navigateTo({
         url: "/pages/approval-detail/index?id=" + id
-
       })
     }
   }
@@ -31,6 +32,7 @@ export default function ApprovalList() {
       let pa = await pendingApprovals();
       setApprovalList(pa);
       setLoading(false)
+      Taro.stopPullDownRefresh()
     }
     retrieval()
   }
@@ -69,7 +71,7 @@ export default function ApprovalList() {
              <View className='status-box'><Text>ALL CLEAR · NO TASKS</Text></View>
           ) : (
             approvalList.map(item => (
-              <View key={item.id} className='card-item' onClick={() => detailPage(item.id)}>
+              <View key={item.id} className='card-item' onClick={() => detailPage(item.applicationId)}>
                 
                 {/* A. 信息主体区域 */}
                 <View className='card-body'>

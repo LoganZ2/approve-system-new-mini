@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { View, Text, ScrollView, Swiper, SwiperItem } from '@tarojs/components'
 import './index.scss'
-import { navigateTo, useDidShow, useLoad } from '@tarojs/taro';
+import { navigateTo, stopPullDownRefresh, useDidShow, useLoad, usePullDownRefresh } from '@tarojs/taro';
 import { getLeaveList } from '../../api/api';
 
 const typeMap = {
@@ -25,17 +25,27 @@ export default function MyApply() {
   const [currentSwiperIndex, setIndex] = useState(0);
   const [data, setData] = useState([]);
 
+  const detailPage = (id) => {
+    if (id) {
+      navigateTo({
+        url: "/pages/approval-detail/index?id=" + id
+      })
+    }
+  }
+
   const refresh = () => {
     // 在内部定义 async 函数并调用
     const init = async () => {
         const data = await getLeaveList();
         setData(data);
+        stopPullDownRefresh()
     };
     init();
   }
 
   useEffect(refresh, [])
   useDidShow(refresh);
+  usePullDownRefresh(refresh)
 
   return (
     <View className="my-apply-root">
@@ -65,7 +75,7 @@ export default function MyApply() {
             <ScrollView className='scroll-v' scrollY>
               <View className='list-padder'>
                 {data.filter(item => item.status === tab.key || tab.key === "all").map(item => (
-                   <View key={item.id} className='card-item' onClick={() => {}}>
+                   <View key={item.id} className='card-item' onClick={() => detailPage(item.id)}>
                       {/* 左侧大数字 */}
                       <View className='left-part'>
                         <Text className='big-stat'>{item.duration}</Text>
