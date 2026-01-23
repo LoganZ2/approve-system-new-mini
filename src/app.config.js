@@ -1,12 +1,15 @@
 export default defineAppConfig({
   pages: [
+
     // 'pages/register/index',
     'pages/index/index',
     'pages/approval-list/index',
     'pages/my-apply/index',
     'pages/apply/index',
     'pages/approval-detail/index',
-    'pages/register/index'
+    'pages/register/index',
+    'pages/update-user/index',
+
   ],
   window: {
     backgroundTextStyle: 'light',

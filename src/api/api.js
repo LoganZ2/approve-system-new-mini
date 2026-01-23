@@ -4,6 +4,10 @@ export const detail = async () => {
   return await http.get('/user/detail')
 }
 
+export const updateUser = async (params) => {
+  return await http.post('/user/update', params)
+}
+
 export const approvalDetail = async (id) => {
   return await http.get('/leave/application-details/' + id)
 }

@@ -272,13 +272,6 @@ export default function ApplyDetail() {
             <View className="process-area">
                 {renderTimeline()}
             </View>
-
-            {/* 
-                【核心机制】：撑开底部的垫脚石 (Spacer)
-                如果不加这个，内容滚到底部时会被 Fixed 操作栏挡住。
-                - 有审批栏时：高度 = 操作栏高度 + Padding ≈ 300px+
-                - 无审批栏时：高度 = 80px 留白即可
-            */}
             <View style={{ width: '100%', height: canAudit ? '340px' : '80px', background:'transparent' }} />
         
         </View>
