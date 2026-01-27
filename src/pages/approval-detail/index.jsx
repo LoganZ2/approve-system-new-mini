@@ -13,6 +13,12 @@ const typeMap = {
   funeral: "丧假"
 }
 
+const statusMap = {
+  pending: '审批中',
+  approved: '已通过',
+  rejected: '被驳回'
+}
+
 // 辅助：日期格式化
 const formatDate = (isoString) => {
   if(!isoString) return ''
@@ -228,14 +234,14 @@ export default function ApplyDetail() {
 
             <View className={`status-banner ${bannerStatusClass}`}>
                 <View className="status-text-row">
-                    <Text className="status-en">{detailData.status?.toUpperCase()}</Text>
+                    <Text className="status-en">{statusMap[detailData.status]}</Text>
                 </View>
                 <View className="decorative-circle" />
             </View>
 
             <View className="info-card">
                 <View className="card-top"> 
-                    <Text className="label">申请人: {detailData.name}</Text>
+                    <Text className="label">申请人: {detailData.name} 已请{detailData.leaveDays}天</Text>
                     <Text className="date">{formatDate(detailData.createdAt)}</Text>
                 </View>
 

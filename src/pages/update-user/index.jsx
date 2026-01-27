@@ -22,6 +22,7 @@ export default function UpdateProfile() {
   const levelOptions = [
     { label: '总经理', value: 'manager' },
     { label: '部门经理', value: 'department_manager' },
+    { label: '副总经理', value: 'deputy_manager' },
     { label: '职员', value: 'employee' }
   ]
 
@@ -112,11 +113,16 @@ export default function UpdateProfile() {
     Taro.showLoading({ title: '保存中...' })
 
     try {
-      await updateUser(formData)
+      await updateUser({
+        id: formData.id,
+        level: formData.level,
+        department: formData.level !== "manager" ? formData.department : '',
+        name: formData.name
+      })
 
       Taro.hideLoading()
       Taro.showToast({
-        title: '修改成功',
+        title: '修改提交成功',
         icon: 'success',
         success: () => {
           setTimeout(() => {

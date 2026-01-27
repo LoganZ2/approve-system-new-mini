@@ -30,6 +30,23 @@ export const pendingApprovals = async () => {
   return res
 }
 
+export const getApplicationList = async () => {
+  let res = await http.get('/leave/application-list')
+  res.forEach(item => {
+    item.startDate = item.startDate.split('T')[0];
+    item.endDate = item.endDate.split('T')[0];
+  })
+  return res
+}
+
+export const updateInfoRequests = async () => {
+  return await http.get('/user/update-info-requests')
+}
+
+export const approveUpdateInfoRequest = async (params) => {
+  await http.post('/user/update/approve', params)
+}
+
 export const getDepartmentList = async () => {
   return await http.get('/user/department-list')
 }

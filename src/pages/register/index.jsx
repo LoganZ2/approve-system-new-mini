@@ -18,6 +18,7 @@ export default function Register() {
   const levelOptions = [
     { label: '总经理', value: 'manager' },
     { label: '部门经理', value: 'department_manager' },
+    { label: '副总经理', value: 'deputy_manager' },
     { label: '职员', value: 'employee' }
   ]
 

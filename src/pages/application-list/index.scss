@@ -1,0 +1,185 @@
+/* src/views/approval-list/index.scss */
+
+$black: #1a1a1a;
+$dark: #333;
+$c-border: #f0f0f0;
+$med-gray: #888;
+$bg-color: #ffffff;
+
+.application-list-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%; 
+  background: $bg-color;
+  position: relative;
+}
+
+/* 顶部与Stats Bar (保持不变) */
+.stats-bar {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 40px; 
+  margin-top: 10px; 
+  border-bottom: 2px solid #fafafa;
+  
+  .stats-text { font-size: 20px; font-weight: 700; color: #ccc; letter-spacing: 1px; }
+  .stats-num { font-size: 24px; font-weight: 900; color: $black; }
+}
+
+.scroll-view-container { 
+  flex: 1; 
+  min-height: 0; 
+  width: 100%; 
+}
+
+/* Loading/Empty State */
+.status-box {
+  text-align: center; padding-top: 150px; font-size: 28px;
+  color: #ddd; font-weight: 800; transform: rotate(-2deg); opacity: 0.5;
+}
+
+.list-inner {
+  padding: 0 40px; 
+  box-sizing: border-box;
+
+  .card-item {
+    /* 弹性布局容器 */
+    display: flex;       
+    flex-direction: row; 
+    flex-wrap: nowrap; /* 【修复关键】严禁换行 */
+    align-items: center; 
+    
+    padding: 30px 0;
+    border-bottom: 1px dashed $c-border;
+    width: 100%; 
+    height: auto;
+    overflow: hidden;
+
+    /* ====== 1. 左侧定宽 ====== */
+    .left-part {
+      width: 110px;
+      flex-shrink: 0; /* 绝不收缩 */
+      text-align: left;
+      margin-right: 10px; /* 和中间保持一点距离 */
+      
+      .big-stat {
+        display: block; font-size: 50px; font-weight: 800;
+        line-height: 0.9; color: $black;
+        font-family: 'DIN Alternate', fantasy, sans-serif;
+      }
+      .small-label {
+        font-size: 18px; color: #bbb; font-weight: 700;
+        margin-top: 6px; display: block; letter-spacing: 1px;
+      }
+    }
+
+    /* ====== 2. 中间部分 (核心修复区域) ====== */
+    .mid-part {
+      /* 【修复关键 Start】 */
+      flex: 1;           /* 占据剩余空间 */
+      width: 0;          /* 强制宽度归零计算，避免内部文字撑爆容器 */
+      /* 【修复关键 End】 */
+
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-right: 15px; /* 给右边的Tag留点呼吸空间 */
+
+      /* 第一行: 名字 + 年度时长 */
+      .row-one {
+        display: flex;
+        flex-direction: row;     /* 必须明确声明方向 */
+        flex-wrap: nowrap;       /* 禁止内部换行 */
+        align-items: baseline;   /* 文字底部对齐 */
+        width: 100%;
+        margin-bottom: 8px;
+
+        .applicant-name {
+          font-size: 32px; 
+          color: $dark; 
+          font-weight: 800;
+          margin-right: 15px;
+          
+          /* 文字超长省略三件套 */
+          white-space: nowrap; 
+          overflow: hidden; 
+          text-overflow: ellipsis;
+          
+          flex-shrink: 1; /* 确实需要收缩名字 */
+          max-width: 100%; /* 防止溢出 */
+        }
+
+        .leave-badge {
+          font-size: 22px; 
+          color: #aaa;
+          font-family: 'DIN Alternate', sans-serif;
+          white-space: nowrap; 
+          flex-shrink: 0; /* 名字可以短，但剩余天数不能显示不全 */
+        }
+      }
+
+      /* 第二行: 类型 + 日期 */
+      .row-two {
+        display: flex; 
+        flex-direction: row;     /* 必须明确声明方向 */
+        flex-wrap: nowrap; 
+        align-items: center;
+        width: 100%;
+        margin-bottom: 6px;
+
+        .type-tag {
+          flex-shrink: 0; /* 类型标签不能被压缩 */
+          font-size: 22px; color: #fff; background: #333; 
+          padding: 2px 6px; border-radius: 4px; border: 1px solid #333;
+          font-weight: 700; margin-right: 10px;
+          white-space: nowrap;
+        }
+
+        .date-val {
+          font-size: 24px; color: #777; font-family: monospace; 
+          background: #f4f4f4; padding: 2px 8px; border-radius: 4px;
+          
+          /* 防止日期超长换行 */
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis; 
+          flex: 1;  /* 占满剩余，超长也就省略 */
+          min-width: 0; /* Firefox/Flex bug fix */
+        }
+      }
+      
+      /* 第三行: 原因 */
+      .reason-text {
+        font-size: 24px; color: #999;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+        width: 100%;
+        display: block; /* 确保占一行 */
+      }
+    }
+
+    /* ====== 3. 右侧Tag定宽 ====== */
+    .right-tag {
+      flex-shrink: 0; /* 绝不收缩 */
+      height: 60px;   /* 限定高度，防止Tag变形 */
+      padding: 0 16px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center; justify-content: center;
+
+      /* 文字样式 */
+      .tag-text {
+        font-size: 22px;
+        font-weight: 900;
+        white-space: nowrap; /* 状态文字不许换行 */
+      }
+
+      /* 配色方案 */
+      &.tag-pending  { background: #fff7e6; color: #fa8c16; }
+      &.tag-approved { background: #e0f8e9; color: #00a854; }
+      &.tag-rejected { background: #ffefef; color: #ff4d4f; }
+    }
+  }
+}

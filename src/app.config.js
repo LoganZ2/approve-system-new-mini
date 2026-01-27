@@ -3,7 +3,9 @@ export default defineAppConfig({
 
     // 'pages/register/index',
     'pages/index/index',
-    'pages/approval-list/index',
+    'pages/application-list/index',
+    'pages/pending-approvals/index',
+    'pages/hr-review-list/index',
     'pages/my-apply/index',
     'pages/apply/index',
     'pages/approval-detail/index',

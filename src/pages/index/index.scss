@@ -5,53 +5,76 @@
   height: 100vh; /* 撑满屏幕 */
   width: 100%;
   overflow: hidden;
+  position: relative; /* 为固定定位做基础 */
 }
 
 .page-header {
   flex-shrink: 0;
-  padding: 40px 30px 20px 40px;
+  padding: 40px 140px 20px 30px; 
   background: #fff;
   display: flex;
-  gap: 40px; /* 两个大标题的间距 */
+  gap: 30px;        
+  align-items: flex-end;
 
   .header-tab {
     display: flex;
     flex-direction: column;
-    opacity: 0.3; /* 默认灰色 */
+    opacity: 0.3; 
     transition: all 0.3s;
+    white-space: nowrap; 
     
     &.active {
-      opacity: 1; /* 选中变黑 */
-      transform: scale(1.02);
+      opacity: 1; 
+      transform: scale(1.05);
     }
 
     .title {
-      font-size: 56px; /* 极简大标题粗细 */
+      font-size: 42px; 
       font-weight: 900;
       color: #111;
-      line-height: 1;
-      margin-bottom: 8px;
-    }
-
-    .subtitle {
-      font-size: 20px;
-      color: #000;
-      font-weight: 600;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      height: 24px; /* 占位防止跳动 */
+      line-height: 1.2;
     }
   }
 }
 
 .page-content {
-  flex: 1;        /* 占据剩余所有高度 */
-  min-height: 0;  /* 关键：防止Flex子元素溢出 */
+  flex: 1;        
+  min-height: 0;  
   position: relative;
-  background: #f9f9f9; /* 加一点微弱背景区分内容区 */
-  border-top-left-radius: 40px; /* 高级感圆角，如果不喜欢可以删掉 */
+  background: #f9f9f9; 
+  border-top-left-radius: 40px; 
   border-top-right-radius: 40px;
   background: #fff;
-  overflow: hidden; /* 把圆角多余的切掉 */
+  overflow: hidden; 
   box-shadow: 0 -4px 20px rgba(0,0,0,0.02);
+}
+
+.hr-float-btn {
+  position: absolute; // 改为 fixed 也可以，视父容器而定
+  bottom: 80px;       // 距离底部的距离
+  right: 40px;        // 距离右边的距离
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(135deg, #66b1ff 0%, #409eff 100%); // 加了渐变稍微高级点，或者直接用 #409eff
+  box-shadow: 0 4px 20px rgba(64, 158, 255, 0.4); // 蓝色投影，有悬浮感
+  border-radius: 50%;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transform: translateY(0);
+  transition: all 0.3s;
+
+  &:active {
+    transform: translateY(4px); // 点击下沉效果
+    box-shadow: 0 2px 10px rgba(64, 158, 255, 0.4);
+  }
+
+  .yt-text {
+    font-size: 20px;
+    color: #fff;
+    font-weight: bold;
+    line-height: 1.1; // 让两行文字紧凑一点
+  }
 }
