@@ -174,15 +174,16 @@ page {
         }
     }
 
-    .btn-row {
-        text-align: right;
-        display: flex; justify-content: flex-end; margin-top: 20px; gap: 20px;
+        .btn-row {
+            text-align: right;
+            display: flex; justify-content: flex-end; margin-top: 20px; gap: 20px;
         .btn-opt {
             margin: 0; // reset
             font-size: 28px; font-weight: 700; padding: 0 40px; height: 80px; line-height: 80px; border-radius: 50px;
             border: none;
             &:after { border: none;}
         }
+        .btn-withdraw { background: #fff1f0; color: #cf1322; border: 1px solid #ffccc7; }
         .btn-reject { background: #f2f2f2; color: #ff4d4f; }
         .btn-approve { background: $c-black; color: #fff; padding: 0 60px;}
     }

@@ -45,11 +45,27 @@ $bg-color: #ffffff;
   padding: 0 40px; 
   box-sizing: border-box;
 
+  .month-title {
+    display: flex;
+    align-items: center;
+    margin: 26px 0 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #f3f3f3;
+
+    .month-title-text {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: $dark;
+      font-family: 'DIN Alternate', sans-serif;
+    }
+  }
+
   .card-item {
     /* 弹性布局容器 */
     display: flex;       
     flex-direction: row; 
-    flex-wrap: nowrap; /* 【修复关键】严禁换行 */
+    flex-wrap: nowrap;
     align-items: center; 
     
     padding: 30px 0;
@@ -78,10 +94,8 @@ $bg-color: #ffffff;
 
     /* ====== 2. 中间部分 (核心修复区域) ====== */
     .mid-part {
-      /* 【修复关键 Start】 */
       flex: 1;           /* 占据剩余空间 */
       width: 0;          /* 强制宽度归零计算，避免内部文字撑爆容器 */
-      /* 【修复关键 End】 */
 
       display: flex;
       flex-direction: column;

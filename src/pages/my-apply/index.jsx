@@ -25,7 +25,6 @@ export default function MyApply() {
   const [currentSwiperIndex, setIndex] = useState(0);
   const [data, setData] = useState([]);
   
-  // 新增：下拉刷新 Loading 状态
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
@@ -33,16 +32,13 @@ export default function MyApply() {
   }, []);
 
   const fetchData = async () => {
-    // 你的数据请求
     try {
       const resp = await getLeaveList();
       setData(resp || []);
     } catch(e) { }
-    // API 请求结束后关闭动画
     setRefreshing(false);
   }
 
-  // 替代 usePullDownRefresh
   const onPullDown = () => {
     setRefreshing(true);
     fetchData();
@@ -55,7 +51,6 @@ export default function MyApply() {
   return (
     <View className="my-apply-root">
       
-      {/* 1. 顶部 Tab (保持原逻辑，风格微调) */}
       <View className="inner-tabs">
         {tabs.map((t, idx) => (
           <View 
@@ -69,7 +64,6 @@ export default function MyApply() {
         ))}
       </View>
 
-      {/* 2. 核心轮播区 */}
       <Swiper 
         className='content-swiper'
         current={currentSwiperIndex}
@@ -78,7 +72,6 @@ export default function MyApply() {
       >
         {tabs.map(tab => (
           <SwiperItem key={tab.key} className='swiper-item-box'>
-            {/* 这里的 ScrollView 配置是解决下拉刷新冲突的关键 */}
             <ScrollView 
                className='scroll-v' 
                scrollY
@@ -90,26 +83,22 @@ export default function MyApply() {
                 {data.filter(item => item.status === tab.key || tab.key === "all").map(item => (
                    <View key={item.id} className='card-item' onClick={() => detailPage(item.id)}>
                       
-                      {/* [左] 天数大字 */}
                       <View className='left-part'>
                         <Text className='big-stat'>{item.duration}</Text>
                         <Text className='small-label'>DAYS</Text>
                       </View>
 
-                      {/* [中] 详细信息 (使用之前修复过换行bug的结构) */}
-                      <View className='mid-part'>
-                        <View className='row-one'>
-                           {/* 重用 text-title 样式，让它像列表页的标题一样突出 */}
-                           <Text className='text-title'>
-                             {typeMap[item.type]}
-                           </Text>
-                        </View>
+                       <View className='mid-part'>
+                         <View className='row-one'>
+                            <Text className='text-title'>
+                              {typeMap[item.type]}
+                            </Text>
+                         </View>
                         <View className="row-two">
                              <Text className='date-val'>{item.startDate} → {item.endDate}</Text>
                         </View>
                       </View>
                       
-                      {/* [右] 状态标签 (胶囊样式复刻) */}
                       <View className={`right-tag tag-${item.status}`}>
                         <Text className='tag-text'>
                           {tabs.find(i => i.key === item.status)?.text || item.status}
@@ -117,7 +106,6 @@ export default function MyApply() {
                       </View>
                    </View>
                 ))}
-                {/* 底部与空状态处理 */}
                 {data.length === 0 && !refreshing && (
                   <View className='empty-box'><Text>EMPTY LIST</Text></View>
                 )}

@@ -4,7 +4,6 @@ import { navigateTo } from '@tarojs/taro'
 import './index.scss'
 import { getApplicationList } from '../../api/api'
 
-// 你的 Maps
 const typeMap = {
   personal: "事假",
   annual: "年假",
@@ -25,13 +24,20 @@ export default function ApplicationList() {
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
 
-  // 模拟第一次加载
+  const groupedByMonth = applicationList.reduce((groups, item) => {
+    const monthKey = item.startDate ? item.startDate.slice(0, 7) : '未知月份'
+    if (!groups[monthKey]) {
+      groups[monthKey] = []
+    }
+    groups[monthKey].push(item)
+    return groups
+  }, {})
+
   useEffect(() => {
     fetchData()
   }, [])
 
   const fetchData = async () => {
-    // 你的数据逻辑
     try {
       let pa = await getApplicationList(); 
       setApplicationList(pa || [])
@@ -60,42 +66,49 @@ export default function ApplicationList() {
         refresherEnabled
         refresherTriggered={refreshing}
         onRefresherRefresh={onPullDown}
-      >
+        >
         <View className='list-inner'>
           {loading && !refreshing ? (
              <View className='status-box'><Text>Loading List...</Text></View>
           ) : (
-            applicationList.map(item => (
-              <View key={item.id} className='card-item' onClick={() => detailPage(item.id)}>
-                
-                {/* 1. Left */}
-                <View className='left-part'>
-                  <Text className='big-stat'>{item.duration}</Text>
-                  <Text className='small-label'>DAYS</Text>
+            Object.keys(groupedByMonth).map(monthKey => (
+              <View key={monthKey}>
+                <View className='month-title'>
+                  <Text className='month-title-text'>{monthKey}</Text>
                 </View>
+                {groupedByMonth[monthKey].map(item => (
+                  <View key={item.id} className='card-item' onClick={() => detailPage(item.id)}>
+                    
+                    {/* 1. Left */}
+                    <View className='left-part'>
+                      <Text className='big-stat'>{item.duration}</Text>
+                      <Text className='small-label'>DAYS</Text>
+                    </View>
 
-                {/* 2. Middle */}
-                <View className='mid-part'>
-                  <View className='row-one'>
-                    <Text className='applicant-name'>{item.applicant}</Text>
-                    {item.leaveDays !== undefined && (
-                      <Text className='leave-badge'>今年已请{item.leaveDays}天</Text>
-                    )}
+                    {/* 2. Middle */}
+                    <View className='mid-part'>
+                      <View className='row-one'>
+                        <Text className='applicant-name'>{item.applicant}</Text>
+                        {item.leaveDays !== undefined && (
+                          <Text className='leave-badge'>今年已请{item.leaveDays}天</Text>
+                        )}
+                      </View>
+
+                      <View className='row-two'>
+                        <Text className='type-tag'>{typeMap[item.type]}</Text>
+                        <Text className='date-val'>{item.startDate}→{item.endDate}</Text>
+                      </View>
+                      
+                       <Text className='reason-text'>{item.reason}</Text>
+                    </View>
+                    
+                    {/* 3. Right Badge */}
+                    <View className={`right-tag tag-${item.status}`}>
+                      <Text className="tag-text">{statusMap[item.status] || item.status}</Text>
+                    </View>
+
                   </View>
-
-                  <View className='row-two'>
-                    <Text className='type-tag'>{typeMap[item.type]}</Text>
-                    <Text className='date-val'>{item.startDate}→{item.endDate}</Text>
-                  </View>
-                  
-                   <Text className='reason-text'>{item.reason}</Text>
-                </View>
-                
-                {/* 3. Right Badge */}
-                <View className={`right-tag tag-${item.status}`}>
-                  <Text className="tag-text">{statusMap[item.status] || item.status}</Text>
-                </View>
-
+                ))}
               </View>
             ))
           )}

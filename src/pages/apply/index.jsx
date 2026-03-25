@@ -15,6 +15,15 @@ const leaveOptions = [
   { value: 'funeral', label: '丧假' }
 ]
 
+const HALF_DAY_MS = 12 * 60 * 60 * 1000
+
+const getDateHalfOrder = (dateStr, half) => {
+  if (!dateStr) return NaN
+  const baseDate = new Date(`${dateStr}T00:00:00`)
+  if (Number.isNaN(baseDate.getTime())) return NaN
+  return baseDate.getTime() + (half === 'PM' ? HALF_DAY_MS : 0)
+}
+
 export default function Apply() {
   const [formData, setFormData] = useState({
     type: 'annual',
@@ -28,11 +37,12 @@ export default function Apply() {
 
   useLoad(() => { console.log('Apply page loaded.') })
 
-  // 这里的计算逻辑保持不变
   useEffect(() => {
     if (formData.startDate && formData.endDate) {
       const start = new Date(formData.startDate)
       const end = new Date(formData.endDate)
+      const startOrder = getDateHalfOrder(formData.startDate, formData.startHalf)
+      const endOrder = getDateHalfOrder(formData.endDate, formData.endHalf)
       
       const diffTime = end - start
       const diffDays = diffTime / (1000 * 60 * 60 * 24)
@@ -41,6 +51,8 @@ export default function Apply() {
       const endWeight = formData.endHalf === 'AM' ? 0.5 : 1.0
 
       let total = diffDays - startWeight + endWeight
+
+      if (endOrder < startOrder) total = 0
 
       if (total < 0) total = 0
       
@@ -56,7 +68,6 @@ export default function Apply() {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
-  // --- 新增：点击一下就切换 AM/PM ---
   const togglePart = (field) => {
     const current = formData[field]
     const next = current === 'AM' ? 'PM' : 'AM'
@@ -68,6 +79,14 @@ export default function Apply() {
       Taro.showToast({ title: '请选择时间', icon: 'none' })
       return
     }
+
+    const startOrder = getDateHalfOrder(formData.startDate, formData.startHalf)
+    const endOrder = getDateHalfOrder(formData.endDate, formData.endHalf)
+    if (Number.isNaN(startOrder) || Number.isNaN(endOrder) || endOrder < startOrder) {
+      Taro.showToast({ title: '结束时间不能早于开始时间', icon: 'none' })
+      return
+    }
+
     let finalData = { ...formData }
     delete finalData.duration;
     finalData.startHalf = finalData.startHalf.toLowerCase();
@@ -86,21 +105,17 @@ export default function Apply() {
 
       <View className='form-body'>
         
-        {/* 类型选择 */}
         <View className='input-box picker-row'>
            <View style={{flex: 1}}>
              <Text className='label'>类型 / TYPE</Text>
              <Picker 
                 mode='selector' 
-                range={leaveOptions} // 传入对象数组
-                rangeKey='label'     // 指定显示对象中的 'label' 字段 (即中文)
-                // 根据当前的 formData.type (英文) 找到它在数组中的下标
+                range={leaveOptions}
+                rangeKey='label'
                 value={leaveOptions.findIndex(opt => opt.value === formData.type)} 
-                // 选中时，根据下标拿到对应的 value (英文) 并更新
                 onChange={(e) => handleInputChange('type', leaveOptions[e.detail.value].value)}
             >
                 <View style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                    {/* 显示时，在数组里找到当前英文对应的中文 label */}
                     <Text className='value-text'>
                     {leaveOptions.find(opt => opt.value === formData.type)?.label || '请选择'}
                     </Text>
@@ -110,10 +125,8 @@ export default function Apply() {
            </View>
         </View>
 
-        {/* 日期 + Toggle */}
         <View className='date-row'>
           
-          {/* 左侧：开始 */}
           <View className='date-col'>
             <Text className='label'>开始 / START</Text>
             
@@ -129,12 +142,10 @@ export default function Apply() {
               </View>
             </Picker>
             
-            {/* 这里的按钮：根据状态变颜色/文字 */}
             <View 
               className={`toggle-btn ${formData.startHalf === 'PM' ? 'is-pm' : 'is-am'}`}
               onClick={() => togglePart('startHalf')}
             >
-              {/* 这里显示 AM 或 PM，点击就变 */}
               <Text className='toggle-text'>{formData.startHalf}</Text>
               <Text className='toggle-hint'>{formData.startHalf === 'AM' ? '上午' : '下午'}</Text>
             </View>
@@ -142,7 +153,6 @@ export default function Apply() {
 
           <View className='date-gap'></View>
 
-          {/* 右侧：结束 */}
           <View className='date-col'>
             <Text className='label'>结束 / END</Text>
             
@@ -168,13 +178,11 @@ export default function Apply() {
           </View>
         </View>
 
-        {/* 巨型数字 */}
         <View className='duration-display'>
           <Text className='duration-num'>{formData.duration}</Text>
           <Text className='duration-label'>Total Days</Text>
         </View>
 
-        {/* 事由 */}
         <View className='input-box textarea-box'>
           <Text className='label'>事由 / REASON</Text>
           <Textarea 

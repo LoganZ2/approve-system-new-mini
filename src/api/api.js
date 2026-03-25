@@ -69,3 +69,7 @@ export const apply = async (params) => {
 export const approve = async (params) => {
   return await http.post('/leave/approve', params)
 }
+
+export const withdraw = async (applicationId) => {
+  return await http.post('/leave/withdraw', { applicationId })
+}

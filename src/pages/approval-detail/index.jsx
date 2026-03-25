@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { View, Text, Textarea, Button } from '@tarojs/components'
-import { useLoad, showToast, usePullDownRefresh, stopPullDownRefresh } from '@tarojs/taro'
-import { applicationDetails, approve, detail } from '../../api/api'
+import { useLoad, showToast, showModal, navigateBack, usePullDownRefresh, stopPullDownRefresh } from '@tarojs/taro'
+import { applicationDetails, approve, detail, withdraw } from '../../api/api'
 import './index.scss'
 
 const typeMap = {
@@ -19,7 +19,6 @@ const statusMap = {
   rejected: '被驳回'
 }
 
-// 辅助：日期格式化
 const formatDate = (isoString) => {
   if(!isoString) return ''
   try {
@@ -37,6 +36,7 @@ export default function ApplyDetail() {
   const [id, setId] = useState(0)
   
   const [canAudit, setCanAudit] = useState(false)
+  const [canWithdraw, setCanWithdraw] = useState(false)
   const [spec, setSpec] = useState({});
 
   const statusColorMap = {
@@ -67,15 +67,30 @@ export default function ApplyDetail() {
     if(options.id) init(options.id)
   })
 
-  // 【核心】页面级下拉监听
   usePullDownRefresh(() => {
     init(id)
   })
+
+  const isCurrentUserApplicant = (user, apply) => {
+    if (!user || !apply) return false
+
+    const normalize = (value) => String(value).trim()
+    const userIdentity = [user.id, user.userId, user.openid, user.name]
+      .filter(value => value !== undefined && value !== null && value !== '')
+      .map(normalize)
+    const applyIdentity = [apply.applicantId, apply.userId, apply.applicantOpenid, apply.openid, apply.name, apply.applicant]
+      .filter(value => value !== undefined && value !== null && value !== '')
+      .map(normalize)
+
+    if (userIdentity.length === 0 || applyIdentity.length === 0) return false
+    return applyIdentity.some(value => userIdentity.includes(value))
+  }
 
   // 统一逻辑处理
   const handleLogic = (user, apply) => {
     setDetailData(apply)
     setCurrentUser(user)
+    setCanWithdraw(!!(apply && apply.status === 'pending' && isCurrentUserApplicant(user, apply)))
 
     let _canAudit = false;
     if (apply && user && apply.status === 'pending') {
@@ -89,6 +104,32 @@ export default function ApplyDetail() {
         }
     }
     setCanAudit(_canAudit)
+  }
+
+  const handleWithdraw = async () => {
+    const applicationId = detailData?.id || id
+    if (!applicationId) {
+      showToast({ title: '申请ID无效', icon: 'none' })
+      return
+    }
+
+    const modalRes = await showModal({
+      title: '确认撤回',
+      content: '撤回后该申请将不再进入审批流程，确定继续吗？'
+    })
+
+    if (!modalRes.confirm) return
+
+    try {
+      await withdraw(applicationId)
+      showToast({ title: '撤回成功', icon: 'success' })
+      setTimeout(() => {
+        navigateBack()
+      }, 300)
+    } catch (e) {
+      console.error(e)
+      showToast({ title: '撤回失败', icon: 'none' })
+    }
   }
 
   // 提交操作
@@ -219,6 +260,7 @@ export default function ApplyDetail() {
 
   // 计算状态样式名
   const bannerStatusClass = statusColorMap[detailData.status] || 'status-pending';
+  const hasActionBar = canAudit || canWithdraw
 
   return (
     // 注意：顶层 View 对应 height: auto，允许滚动
@@ -278,14 +320,14 @@ export default function ApplyDetail() {
             <View className="process-area">
                 {renderTimeline()}
             </View>
-            <View style={{ width: '100%', height: canAudit ? '340px' : '80px', background:'transparent' }} />
+            <View style={{ width: '100%', height: canAudit ? '340px' : (hasActionBar ? '180px' : '80px'), background:'transparent' }} />
         
         </View>
 
         {/* 底部操作区 (Fixed Float) */}
-        {canAudit && (
+        {hasActionBar && (
         <View className="action-bar-float">
-            <View className="input-wrap">
+            {canAudit && <View className="input-wrap">
                 <Textarea 
                     value={comment} 
                     onInput={(e) => setComment(e.detail.value)}
@@ -297,10 +339,11 @@ export default function ApplyDetail() {
                     autoHeight={true} 
                     cursorSpacing={60} // 键盘弹起距离
                 />
-            </View>
+            </View>}
             <View className="btn-row">
-                <Button className="btn-opt btn-reject" onClick={() => handleAction('rejected')}>驳回</Button>
-                <Button className="btn-opt btn-approve" onClick={() => handleAction('approved')}>通过</Button>
+                {canWithdraw && <Button className="btn-opt btn-withdraw" onClick={handleWithdraw}>撤回</Button>}
+                {canAudit && <Button className="btn-opt btn-reject" onClick={() => handleAction('rejected')}>驳回</Button>}
+                {canAudit && <Button className="btn-opt btn-approve" onClick={() => handleAction('approved')}>通过</Button>}
             </View>
         </View>
         )}
